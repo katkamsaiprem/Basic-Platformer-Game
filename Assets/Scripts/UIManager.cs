@@ -1,21 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using DG.Tweening;
-using UnityEngine.UI;
+using DG.Tweening; // DOTween for smooth animations
+using UnityEngine.UI; // For UI elements like Toggle
 
 
 public class UIManager : MonoBehaviour
 {
+    // Singleton instance for global access
     public static UIManager instance;
 
+    // List of screen information objects
     [SerializeField]
     List<UIScreenInfo> screenInfos = new List<UIScreenInfo>();
-       
+
+    // Dictionary to map screen types to their info for quick access
     Dictionary<ScreenTypes, UIScreenInfo> screens = new Dictionary<ScreenTypes, UIScreenInfo>();
-      
+
+    // Enum defining different types of UI screens
     public enum ScreenTypes
-    { 
+    {
         MAIN_MENU,
         GAMEPLAY,
         SETTINGS,
@@ -31,45 +35,48 @@ public class UIManager : MonoBehaviour
         RATE_US
     }
 
+    // Keys for saving sound and music settings
     public string music_Key = "MUSIC_ON";
     public string sound_Key = "SOUND_ON";
 
-   
-    /// 
-    [SerializeField] Toggle soundToggle,musicToggle;
+    // Toggle references for sound and music
+    [SerializeField] Toggle soundToggle, musicToggle;
 
-    private Stack<UIScreenInfo> screenHistory 
-        = new Stack<UIScreenInfo>();
+    // Stack to keep track of screen navigation history
+    private Stack<UIScreenInfo> screenHistory = new Stack<UIScreenInfo>();
 
     private void Awake()
     {
+        // Singleton pattern setup
         if (instance == null)
         {
             instance = this;
         }
 
+        // Initialize the screens dictionary with screen info from the list
         foreach (UIScreenInfo info in screenInfos)
         {
             screens[info.scrType] = info;
         }
     }
 
-
     private void Start()
-    {        
+    {
+        // Perform initial UI updates (e.g., settings states)
         MakeUIUpdates();
     }
-      
 
-   
     void Update()
     {
+        // Handle back button functionality (e.g., Android back button)
         if (Input.GetKeyDown(KeyCode.Escape))
             HandleBackFunctionality();
     }
 
     void HandleBackFunctionality()
     {
+
+        // If there's a history of screens navigated, go back to the last one
         if (screenHistory.Count > 0)
         {
             UIScreenInfo lastScreen = screenHistory.Pop();
@@ -84,6 +91,7 @@ public class UIManager : MonoBehaviour
 
     void ShowPopup(UIScreenInfo screen)
     {
+        // Show a UI screen with a pop-up animation
         if (screens.TryGetValue(screen.scrType, out UIScreenInfo currtInfo))
         {
             currtInfo.screenRef.SetActive(true);
@@ -95,6 +103,7 @@ public class UIManager : MonoBehaviour
 
     void HidePopup(UIScreenInfo screen)
     {
+        // Hide a UI screen with a reverse pop-up animation
         if (screens.TryGetValue(screen.scrType, out UIScreenInfo currtInfo))
         {
             currtInfo.screenRef.transform.
@@ -108,6 +117,7 @@ public class UIManager : MonoBehaviour
 
     void TransitionToScreen(UIScreenInfo screen)
     {
+        // Transition to a specific screen, saving the current screen in history
         if (screenHistory.Count == 0 ||
             screenHistory.Peek() != screen)
         {
@@ -116,6 +126,11 @@ public class UIManager : MonoBehaviour
 
         ShowPopup(screen);
     }
+
+    //-------------------------------------------------------------//
+
+    // The following methods control showing or hiding main menu, gameplay, and settings screens
+    // They use the ShowPopup and HidePopup methods for transitions
 
     public void ShowOrHideMainMenu(bool isOpen)
     {
@@ -191,6 +206,11 @@ public class UIManager : MonoBehaviour
         MakeUIUpdates();
     }
 
+
+    /// <summary>
+    /// Update UI elements based on saved settings (sound and music)
+    /// For example, set the toggles on or off based on saved preferences
+    /// </summary>
     void MakeUIUpdates()
     {
         if (SaveDataManager.instance.GetInt(music_Key) > 0)
