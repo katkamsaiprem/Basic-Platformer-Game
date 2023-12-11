@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ParallaxEffect : MonoBehaviour
 {
-    [SerializeField]
-    private Transform[] BGS;
+    [FormerlySerializedAs("BGS")] [SerializeField]
+    private Transform[] bgs;
     private float[] parallaxScales;
 
     public float smoothing;
@@ -23,10 +24,10 @@ public class ParallaxEffect : MonoBehaviour
     {
         prevCamPos = cam.position;
 
-        parallaxScales = new float[BGS.Length];
-        for (int i = 0; i < BGS.Length; i++)
+        parallaxScales = new float[bgs.Length];
+        for (int i = 0; i < bgs.Length; i++)
         {
-            parallaxScales[i] = BGS[i].position.z * -1f;
+            parallaxScales[i] = bgs[i].position.z * -1f;
         }
     }
 
@@ -37,17 +38,17 @@ public class ParallaxEffect : MonoBehaviour
 
     void ParallaxEffector()
     {
-        for (int i = 0; i < BGS.Length; i++)
+        for (int i = 0; i < bgs.Length; i++)
         {
             float parallax = (prevCamPos.x - cam.position.x)
-                * parallaxScales[i];
+                             * parallaxScales[i];
 
-            float targetPosX = BGS[i].position.x + parallax;
+            float targetPosX = bgs[i].position.x + parallax;
 
             Vector3 bgTargetPos = new Vector3(targetPosX,
-                BGS[i].position.y, BGS[i].position.z);
+                bgs[i].position.y, bgs[i].position.z);
 
-            BGS[i].position = Vector3.Lerp(BGS[i].position,bgTargetPos,smoothing*Time.deltaTime);
+            bgs[i].position = Vector3.Lerp(bgs[i].position,bgTargetPos,smoothing*Time.deltaTime);
 
         }
         prevCamPos = cam.position;

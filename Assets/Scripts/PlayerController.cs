@@ -56,7 +56,7 @@ public class PlayerController : MonoBehaviour
         CheckGroundStatus();
         ApplyJump();
         ApplyMovement();
-        ApplyGravity();
+        
 
         //------
         if (isDashing)
@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
             timeSinceLeftGround = Time.time;
         }
     }
-
+  
     void ApplyMovement()
     {
         float targetSpeed = inputAxis.x * stats.maxSpeed;
@@ -129,7 +129,7 @@ public class PlayerController : MonoBehaviour
         {
 
             float wallJumpDir = (inputAxis.x > 0) ? -1 : 1;
-            rb.AddForce(new Vector2(wallJumpDir*stats.wallJumpForce,stats.wallJumpPower),ForceMode2D.Impulse);
+            rb.AddForce(new Vector2(wallJumpDir * stats.wallJumpForce, stats.wallJumpPower), ForceMode2D.Impulse);
             jumpCount = 0;
 
             StartCoroutine(DisableWallJump(stats.tempDisableDuration));
@@ -137,9 +137,7 @@ public class PlayerController : MonoBehaviour
 
         //---------
 
-        if ((canJump || (canCoyoteJump && !isGrounded)
-            && (Time.time < timeSinceLeftGround + stats.coyoteTime))
-            && isGrounded)
+        if ((canJump || (canCoyoteJump && !isGrounded) && (Time.time < timeSinceLeftGround + stats.coyoteTime)) && isGrounded)
         {
             velocity.y = stats.jumpPower;
             rb.velocity = new Vector2(rb.velocity.x, velocity.y);
@@ -159,22 +157,6 @@ public class PlayerController : MonoBehaviour
     {
         isTouchingWall = false;
         yield return new WaitForSeconds(duration);
-    }
-
-    void ApplyGravity()
-    {
-        if (!isGrounded)
-        {
-            float gravityForce =
-                (rb.velocity.y > 0 && !Input.GetButton("Jump")) ?
-                      stats.fallAccleration : stats.inAirAcceleration;
-
-            velocity.y = Mathf.MoveTowards(rb.velocity.y,
-                -stats.MaxFallSpeed,
-                gravityForce * Time.fixedDeltaTime);
-
-            rb.velocity = new Vector2(rb.velocity.x,velocity.y);
-        }
     }
 
     //---------------
@@ -234,7 +216,7 @@ public class PlayerController : MonoBehaviour
         public float fallAccleration = 30f;
         public float inAirAcceleration = 15f;
         public float MaxFallSpeed = 20f;
-        public float GroundForce = -0.5f;
+        public float GroundForce = -0.5f;   
         public float GroundDistance = 0.1f;
         public float coyoteTime = 0.2f;
         public float jumpBuffer = 0.1f;
